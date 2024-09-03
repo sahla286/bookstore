@@ -6,7 +6,7 @@ class Books(models.Model):
     price=models.PositiveIntegerField()
     description=models.CharField(max_length=300)
     category=models.CharField(max_length=100)
-    image=models.ImageField(null=True)
+    image=models.ImageField(upload_to='image',null=True)
     
     # building render method
     # __str__ string representation method
