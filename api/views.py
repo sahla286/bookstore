@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from api.models import Books
-from api.serializers import ProductSerializer
+from api.serializers import ProductSerializer,ProductModelSerializer
 
 # Create your views here.
 
@@ -45,5 +46,42 @@ class ProductDetailsView(APIView):
         return Response(data='Item deleted')
 
 
-# seralizers(serialization)
+class ProductViewsetView(ViewSet):
+    def list(self,request,*args,**kw):
+        qs=Books.objects.all()
+        serializer=ProductModelSerializer(qs,many=True)
+        return Response(data=serializer.data)
+    
+    # post products
+    def create(self,request,*args,**kw):
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
+        
+    # get a product
+    def retrieve(self,request,*args,**kw):
+        id = kw.get('pk')
+        qs=Books.objects.get(id=id)
+        serializer = ProductModelSerializer(qs)
+        return Response(data=serializer.data)
+    
+    def update(self,request,*args,**kw):
+        id = kw.get('pk')
+        obj=Books.objects.get(id=id)
+        serializer = ProductModelSerializer(data=request.data,instance=obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        else:
+            return Response(data=serializer.errors)
+
+    def destroy(self,request,*args,**kw):
+        id = kw.get('pk')
+        Books.objects.filter(id=id).delete()
+        return Response(data='Item deleted')
+
+
 
