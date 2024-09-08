@@ -3,7 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from api.models import Books
-from api.serializers import ProductSerializer,ProductModelSerializer
+from api.serializers import ProductSerializer,ProductModelSerializer,UserSerializer
+from rest_framework.decorators import action
+from django.contrib.auth.models import User
 
 # Create your views here.
 
@@ -82,6 +84,44 @@ class ProductViewsetView(ViewSet):
         id = kw.get('pk')
         Books.objects.filter(id=id).delete()
         return Response(data='Item deleted')
+       
+# custom method
+    @action(methods=['GET'],detail=False)
+    def categories(self,request,*args,**kw):
+        qs=Books.objects.values_list('category',flat=True).distinct()
+        return Response(data=qs)
+
+
+class UserViewsetView(ViewSet):
+        def create(self,request,*args,**kw):
+            serializer = UserSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data)
+            else:
+                return Response(data=serializer.errors)
+        
+        def update(self,request,*args,**kw):
+            id = kw.get('pk')
+            obj=User.objects.get(id=id)
+            serializer = UserSerializer(data=request.data,instance=obj)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data=serializer.data)
+            else:
+                return Response(data=serializer.errors)
+            
+        def destroy(self,request,*args,**kw):
+            id = kw.get('pk')
+            User.objects.filter(id=id).delete()
+            return Response(data='Item deleted')
+
+
+
+
+# seralizers(serialization)
+
+
 
 
 
