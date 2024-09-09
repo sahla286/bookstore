@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from api.models import Books
 from api.serializers import ProductSerializer,ProductModelSerializer,UserSerializer
@@ -47,44 +47,10 @@ class ProductDetailsView(APIView):
         Books.objects.filter(id=id).delete()
         return Response(data='Item deleted')
 
+class ProductViewsetView(ModelViewSet):
+    serializer_class=ProductModelSerializer
+    queryset=Books.objects.all()
 
-class ProductViewsetView(ViewSet):
-    def list(self,request,*args,**kw):
-        qs=Books.objects.all()
-        serializer=ProductModelSerializer(qs,many=True)
-        return Response(data=serializer.data)
-    
-    # post products
-    def create(self,request,*args,**kw):
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
-        else:
-            return Response(data=serializer.errors)
-        
-    # get a product
-    def retrieve(self,request,*args,**kw):
-        id = kw.get('pk')
-        qs=Books.objects.get(id=id)
-        serializer = ProductModelSerializer(qs)
-        return Response(data=serializer.data)
-    
-    def update(self,request,*args,**kw):
-        id = kw.get('pk')
-        obj=Books.objects.get(id=id)
-        serializer = ProductModelSerializer(data=request.data,instance=obj)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
-        else:
-            return Response(data=serializer.errors)
-
-    def destroy(self,request,*args,**kw):
-        id = kw.get('pk')
-        Books.objects.filter(id=id).delete()
-        return Response(data='Item deleted')
-       
 # custom method
     @action(methods=['GET'],detail=False)
     def categories(self,request,*args,**kw):
@@ -92,36 +58,6 @@ class ProductViewsetView(ViewSet):
         return Response(data=qs)
 
 
-class UserViewsetView(ViewSet):
-        def create(self,request,*args,**kw):
-            serializer = UserSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(data=serializer.data)
-            else:
-                return Response(data=serializer.errors)
-        
-        def update(self,request,*args,**kw):
-            id = kw.get('pk')
-            obj=User.objects.get(id=id)
-            serializer = UserSerializer(data=request.data,instance=obj)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(data=serializer.data)
-            else:
-                return Response(data=serializer.errors)
-            
-        def destroy(self,request,*args,**kw):
-            id = kw.get('pk')
-            User.objects.filter(id=id).delete()
-            return Response(data='Item deleted')
-
-
-
-
-# seralizers(serialization)
-
-
-
-
-
+class UserViewsetView(ModelViewSet):
+    serializer_class=UserSerializer
+    queryset=User.objects.all()
