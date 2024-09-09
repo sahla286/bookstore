@@ -9,8 +9,5 @@ router.register('users',views.UserViewsetView,basename='users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('books/',views.ProductView.as_view()),
-    path('books/<int:id>/', views.ProductDetailsView.as_view()),
-
 ] +router.urls
 
